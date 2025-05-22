@@ -98,7 +98,7 @@ namespace DemoAppAPI.Controllers
 
                 string sql_1 = "SELECT FileId FROM [DemoDB].[dbo].[UploadedFiles] WHERE userId = @userName";
             bool res = checkUserFile(userName);
-            if (res == true)
+            if (res == false)
             {
                 return BadRequest("User does not have access to file");
             }
@@ -113,7 +113,7 @@ namespace DemoAppAPI.Controllers
 
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
-                        command.Parameters.AddWithValue("@FileId", fileName); // Use parameterized query for safety
+                        command.Parameters.AddWithValue("@FileId", nameFile); // Use parameterized query for safety
 
                         using (SqlDataReader reader = await command.ExecuteReaderAsync())
                         {
@@ -175,25 +175,11 @@ namespace DemoAppAPI.Controllers
 
                     string sql_1 = "SELECT FileId FROM [DemoDB].[dbo].[UploadedFiles] WHERE userId = @userName";
                     bool res = checkUserFile(userName);
-                    if(res == true)
+                    if(res == false)
                     {
                         return BadRequest("User does not have access to file");
                     }
-                    using (SqlCommand command = new SqlCommand(sql_1, connection))
-                    {
-                       
-                        command.Parameters.AddWithValue("@userName", userName);
-
-                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                        {
-                            if (await reader.ReadAsync()) // Check if a record was found
-                            {
-                                fileName = reader.GetString(0);      // Column 0: FileName
-                                contentType = reader.GetString(1);   // Column 1: ContentType
-                                fileBytes = (byte[])reader.GetValue(2); // Column 2: FileData (VARBINARY(MAX))
-                            }
-                        }
-                    }
+                    
 
                     // Select the necessary columns: FileName, ContentType, and the binary FileData
                     string sql = "SELECT [FileName], [ContentType], [FileData] FROM [dbo].[UploadedFiles] " +
